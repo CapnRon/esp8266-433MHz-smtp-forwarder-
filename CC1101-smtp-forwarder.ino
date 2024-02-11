@@ -23,9 +23,6 @@ SMTPSession smtp;
 uint32_t last_signal_value = 0;
 uint32_t last_signal_timeout = 0;
 
-// Uncomment the following line to enable debugging
-// #define DEBUG_MESSAGES
-
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -80,19 +77,15 @@ void handleReceivedSignal(byte* buffer) {
 
   if (cc1101.CheckRxFifo(100)) {
     if (cc1101.CheckCRC()) {
-      #ifdef DEBUG_MESSAGES
-        Serial.print("Rssi: ");
-        Serial.println(cc1101.getRssi());
-        Serial.print("LQI: ");
-        Serial.println(cc1101.getLqi());
-      #endif
+      Serial.print("Rssi: ");
+      Serial.println(cc1101.getRssi());
+      Serial.print("LQI: ");
+      Serial.println(cc1101.getLqi());
 
       int len = cc1101.ReceiveData(buffer);
       buffer[len] = '\0';
-      #ifdef DEBUG_MESSAGES
-        Serial.print("Received Signal: ");
-        Serial.println((char *)buffer);
-      #endif
+      Serial.print("Received Signal: ");
+      Serial.println((char *)buffer);
 
       // Add email sending code here
       sendEmail((char *)buffer);
@@ -112,9 +105,7 @@ void sendEmail(char* message) {
   config.login.user_domain = F("127.0.0.1");
 
   if (!smtp.connect(&config)) {
-    #ifdef DEBUG_MESSAGES
-      Serial.println("Connection error to SMTP server.");
-    #endif
+    Serial.println("Connection error to SMTP server.");
     return;
   }
 
@@ -126,9 +117,7 @@ void sendEmail(char* message) {
   email.text.content = message;
 
   if (!MailClient.sendMail(&smtp, &email)) {
-    #ifdef DEBUG_MESSAGES
-      Serial.println("Failed to send email.");
-    #endif
+    Serial.println("Failed to send email.");
   }
 }
 
@@ -137,11 +126,9 @@ void smtpCallback(SMTP_Status status) {
 }
 
 void printEmailStatus() {
-  #ifdef DEBUG_MESSAGES
-    if (smtp.connected()) {
-      Serial.println("Email Connection Status: Connected");
-    } else {
-      Serial.println("Email Connection Status: Disconnected");
-    }
-  #endif
+  if (smtp.connected()) {
+    Serial.println("Email Connection Status: Connected");
+  } else {
+    Serial.println("Email Connection Status: Disconnected");
+  }
 }
